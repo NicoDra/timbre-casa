@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Timbre</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: #1a1a2e;
+            color: #eee;
+            font-family: sans-serif;
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .icono {
+            font-size: 5rem;
+            margin-bottom: 1rem;
+        }
+
+        h1 {
+            font-size: 1.8rem;
+            margin-bottom: 0.5rem;
+        }
+
+        p {
+            color: #aaa;
+            margin-bottom: 2rem;
+            font-size: 1rem;
+        }
+
+        button {
+            background: #e94560;
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            font-size: 1.1rem;
+            border-radius: 10px;
+            cursor: pointer;
+            width: 100%;
+            max-width: 300px;
+            transition: background 0.2s;
+        }
+
+        button:disabled {
+            background: #555;
+            cursor: not-allowed;
+        }
+
+        #estado {
+            margin-top: 1.5rem;
+            font-size: 0.95rem;
+            min-height: 1.5rem;
+        }
+
+        .ok {
+            color: #4ecca3;
+        }
+
+        .error {
+            color: #e94560;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="icono">🔔</div>
+    <h1>¡Hay alguien en la puerta!</h1>
+    <p>Avisando automáticamente…</p>
+    <button id="btn" onclick="avisar()">AVISAR</button>
+    <div id="estado"></div>
+
+    <script>
+        // Reemplazá esta URL con la de tu Cloudflare Worker una vez desplegado
+        const WORKER_URL = 'https://timbre.TU-USUARIO.workers.dev/notify';
+
+        async function avisar() {
+            const btn = document.getElementById('btn');
+            const estado = document.getElementById('estado');
+
+            btn.disabled = true;
+            btn.textContent = 'Avisando…';
+            estado.textContent = '';
+            estado.className = '';
+
+            try {
+                const res = await fetch(WORKER_URL, { method: 'POST' });
+                if (!res.ok) throw new Error('Respuesta no OK');
+
+                btn.textContent = '✓ Aviso enviado';
+                estado.textContent = '¡Listo! Ya saben que estás ahí.';
+                estado.className = 'ok';
+            } catch {
+                btn.disabled = false;
+                btn.textContent = 'Reintentar';
+                estado.textContent = 'No se pudo enviar. Tocá para reintentar.';
+                estado.className = 'error';
+            }
+        }
+
+        // Enviar automáticamente al cargar la página
+        window.addEventListener('load', avisar);
+    </script>
+</body>
+
+</html>
