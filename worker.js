@@ -1,8 +1,7 @@
 // worker.js — Cloudflare Worker proxy para el timbre
 // El token de Telegram nunca sale de aquí (vive en env secrets de Cloudflare)
 
-// Reemplazá con tu dominio real de GitHub Pages, ej: https://nicoXXX.github.io
-const ALLOWED_ORIGIN = 'https://TU-USUARIO.github.io';
+const ALLOWED_ORIGIN = 'https://nicodra.github.io';
 
 export default {
   async fetch(request, env) {
