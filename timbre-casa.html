@@ -1,0 +1,21 @@
+async function avisar() {
+const token = '8663351579:AAH_KjnJBr9O30zMha26NVO7-TtFuRWsDoI';
+const chatId = '1785298225'; // Ya le puse tu ID real
+const url = `https://api.telegram.org/bot${token}/sendMessage`;
+
+try {
+await fetch(url, {
+method: 'POST',
+headers: { 'Content-Type': 'application/json' },
+body: JSON.stringify({
+chat_id: chatId,
+text: "🚨 ¡Nico, hay alguien en la puerta! (Escaneado desde el QR)"
+})
+});
+document.getElementById('ok').style.display = 'block';
+document.getElementById('btn').innerText = "AVISANDO...";
+document.getElementById('btn').disabled = true;
+} catch (e) {
+alert("Error de conexión. ¡Golpeá la puerta fuerte!");
+}
+}
