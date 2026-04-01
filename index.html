@@ -84,10 +84,23 @@
 
     <script>
         const WORKER_URL = 'https://timbre.nico119.workers.dev/notify';
+        const COOLDOWN_MS = 60 * 1000; // 60 segundos entre avisos
 
         async function avisar() {
             const btn = document.getElementById('btn');
             const estado = document.getElementById('estado');
+
+            const ultimoAviso = parseInt(localStorage.getItem('ultimoAviso') || '0');
+            const ahora = Date.now();
+            const restante = COOLDOWN_MS - (ahora - ultimoAviso);
+
+            if (restante > 0) {
+                btn.disabled = true;
+                btn.textContent = '✓ Ya avisado';
+                estado.textContent = `Aviso enviado hace poco. Esperá ${Math.ceil(restante / 1000)}s.`;
+                estado.className = 'ok';
+                return;
+            }
 
             btn.disabled = true;
             btn.textContent = 'Avisando…';
@@ -98,6 +111,7 @@
                 const res = await fetch(WORKER_URL, { method: 'POST' });
                 if (!res.ok) throw new Error('Respuesta no OK');
 
+                localStorage.setItem('ultimoAviso', String(Date.now()));
                 btn.textContent = '✓ Aviso enviado';
                 estado.textContent = '¡Listo! Ya saben que estás ahí.';
                 estado.className = 'ok';
