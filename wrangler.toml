@@ -2,6 +2,10 @@ name = "timbre"
 main = "worker.js"
 compatibility_date = "2025-01-01"
 
+[[kv_namespaces]]
+binding = "RATE_LIMIT"
+id = "c435fe8ded9a436885d9ce7ab9f26811"
+
 # Los secrets (TELEGRAM_TOKEN y CHAT_ID) se configuran via CLI, NO acá:
 # npx wrangler secret put TELEGRAM_TOKEN
 # npx wrangler secret put CHAT_ID

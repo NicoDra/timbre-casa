@@ -84,21 +84,39 @@
 
     <script>
         const WORKER_URL = 'https://timbre.nico119.workers.dev/notify';
-        const COOLDOWN_MS = 60 * 1000; // 60 segundos entre avisos
+        const COOLDOWN_MS = 60 * 1000;
+
+        let countdownInterval = null;
+
+        function iniciarCuenta(btn, estado, desde) {
+            clearInterval(countdownInterval);
+            countdownInterval = setInterval(() => {
+                const restante = COOLDOWN_MS - (Date.now() - desde);
+                if (restante <= 0) {
+                    clearInterval(countdownInterval);
+                    btn.disabled = false;
+                    btn.textContent = 'AVISAR DE NUEVO';
+                    estado.textContent = '';
+                    estado.className = '';
+                    return;
+                }
+                btn.textContent = `✓ Avisado — ${Math.ceil(restante / 1000)}s`;
+            }, 500);
+        }
 
         async function avisar() {
             const btn = document.getElementById('btn');
             const estado = document.getElementById('estado');
 
             const ultimoAviso = parseInt(localStorage.getItem('ultimoAviso') || '0');
-            const ahora = Date.now();
-            const restante = COOLDOWN_MS - (ahora - ultimoAviso);
+            const restante = COOLDOWN_MS - (Date.now() - ultimoAviso);
 
             if (restante > 0) {
                 btn.disabled = true;
-                btn.textContent = '✓ Ya avisado';
-                estado.textContent = `Aviso enviado hace poco. Esperá ${Math.ceil(restante / 1000)}s.`;
+                btn.textContent = `✓ Avisado — ${Math.ceil(restante / 1000)}s`;
+                estado.textContent = '¡Listo! Ya saben que estás ahí.';
                 estado.className = 'ok';
+                iniciarCuenta(btn, estado, ultimoAviso);
                 return;
             }
 
@@ -109,12 +127,14 @@
 
             try {
                 const res = await fetch(WORKER_URL, { method: 'POST' });
-                if (!res.ok) throw new Error('Respuesta no OK');
+                if (!res.ok) throw new Error('no ok');
 
-                localStorage.setItem('ultimoAviso', String(Date.now()));
-                btn.textContent = '✓ Aviso enviado';
+                const ahora = Date.now();
+                localStorage.setItem('ultimoAviso', String(ahora));
+                btn.textContent = `✓ Avisado — ${COOLDOWN_MS / 1000}s`;
                 estado.textContent = '¡Listo! Ya saben que estás ahí.';
                 estado.className = 'ok';
+                iniciarCuenta(btn, estado, ahora);
             } catch {
                 btn.disabled = false;
                 btn.textContent = 'Reintentar';
@@ -123,7 +143,6 @@
             }
         }
 
-        // Enviar automáticamente al cargar la página
         window.addEventListener('load', avisar);
     </script>
 </body>
